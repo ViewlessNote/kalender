@@ -11,12 +11,12 @@ const ref1 = ref({
   Ende: new Date()
 })
 function btnSave() {
-     if(validateDate(window.localStorage.getItem("StorageForm"))){
-       arr.value.push(window.localStorage.getItem("StorageForm"));
-       console.log(arr);
-       window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
+     if(!validateDate(window.localStorage.getItem("StorageForm"))){
+       return 0
      }
-
+  arr.value.push(window.localStorage.getItem("StorageForm"));
+  console.log(arr);
+  window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
 
 
 }
@@ -53,14 +53,18 @@ function validateDate(StrageForm) {
           alert("Deine eingegebene Start/Ende zeit ist schon belegt")
           return false;
         }else {console.log(Start + OStart);}
-        if (Ende >OStart && Ende < OEnde){
+        if (Ende < OStart && Ende > OEnde){
           alert("Zeitraum schon belegt")
           return false;
-        }else if (Start < OStart && Start > OEnde){
+        }
+        if (Start < OStart && Start > OEnde){
           alert("Zeotraum schon belegt")
           return false;
         }
-
+        if (Start < OStart && Ende > OEnde){
+          alert("Zeotraum schon belegt")
+          return false;
+        }
       }
       return true;
 
