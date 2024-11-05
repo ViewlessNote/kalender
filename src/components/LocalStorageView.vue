@@ -53,15 +53,19 @@ function validateDate(StrageForm) {
           return false;
         }else {console.log(Start + OStart);}
         if (Ende < OStart && Ende > OEnde){
-          alert("Zeitraum schon belegt")
+          alert("Zeitraum schon belegt (Ende drin)")
           return false;
         }
         if (Start < OStart && Start > OEnde){
-          alert("Zeotraum schon belegt")
+          alert("Zeotraum schon belegt (Strat drin)")
           return false;
         }
         if (Start < OStart && Ende > OEnde){
-          alert("Zeotraum schon belegt")
+          alert("Zeotraum schon belegt (Drinnen)")
+          return false;
+        }
+        if (Start > OStart && Ende < OEnde){
+          alert("Zeotraum schon belegt (Drüber)")
           return false;
         }
       }
