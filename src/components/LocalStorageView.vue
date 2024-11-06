@@ -7,7 +7,8 @@ var now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatD
 const ref1 = ref({
   name: "",
   Start: new Date(),
-  Ende: new Date()
+  Ende: new Date(),
+  Aufgaben: false
 })
 function btnSave() {
      if(!validateDate(window.localStorage.getItem("StorageForm"))){
