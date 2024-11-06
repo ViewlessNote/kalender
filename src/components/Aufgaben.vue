@@ -2,18 +2,15 @@
 import {ref, watch} from "vue";
 
 const arr = ref([]);
-const today = new Date();
-var now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 const ref1 = ref({
   name: "",
-  Start: new Date(),
   DeadLine: new Date()
 })
 function btnSave() {
-  if(!validateDate(window.localStorage.getItem("StorageForm"))){
+  if(!validateDate(window.localStorage.getItem("AufgabenForm"))){
     return 0
   }
-  arr.value.push(window.localStorage.getItem("StorageForm"));
+  arr.value.push(window.localStorage.getItem("AufgabenForm"));
   console.log(arr);
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
 }
@@ -25,14 +22,14 @@ function FormatDay(){
   return today.getDate()
 }
 
-const AufgabenForm = window.localStorage.getItem("StorageForm");
-const ArrLocalStorage = window.localStorage.getItem("arr");
-watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
+const AufgabenForm = window.localStorage.getItem("AufgabenForm");
+const AufgabenArr = window.localStorage.getItem("arr");
+watch(ref1, val => {window.localStorage.setItem("AufgabenForm", JSON.stringify(val));
 },{deep:true});
 
 addEventListener("submit", btnSave);
 
-
+/*
 function validateDate(StrageForm) {
   const Start = JSON.parse(StrageForm).Start;
   const Ende = JSON.parse(StrageForm).Ende;
@@ -66,7 +63,7 @@ function validateDate(StrageForm) {
   return true;
 
 }
-
+*/
 
 
 
@@ -74,7 +71,7 @@ function validateDate(StrageForm) {
 </script>
 
 <template>
-  <h1>Erstelle einen Kalender Eintrage {{now_date}}</h1>
+  <h1>Erstelle eine Aufgabe </h1>
   <form v-on:submit.prevent="">
     <input
         v-model="ref1.name"
@@ -83,14 +80,7 @@ function validateDate(StrageForm) {
         required
     />
 
-    <input
-        v-model="ref1.Start"
-        placeholder="Datum"
-        type="datetime-local"
-        min=2024-11-04T12:01
-        required
-    />
-
+    <div>Deadline (*Optional)</div>
     <input
         v-model="ref1.DeadLine"
         type="datetime-local"
@@ -100,7 +90,7 @@ function validateDate(StrageForm) {
   </form>
 
   <ul v-for="x in arr" key="{{x}}">
-    <li>{{JSON.parse(x).name}} Start:{{JSON.parse(x).Start}} Ende:{{JSON.parse(x).Ende}}</li>
+    <li> Aufgaben: {{JSON.parse(x).name}} Start:{{JSON.parse(x).DeadLine}}</li>
 
   </ul>
 
