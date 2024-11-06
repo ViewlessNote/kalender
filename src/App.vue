@@ -1,6 +1,6 @@
 <script setup>
-import HelloWorld from './components/LocalStorageView.vue'
-import TheWelcome from './components/Aufgaben.vue'
+import LocalStorageView from './components/LocalStorageView.vue'
+import Aufgaben from './components/Aufgaben.vue'
 </script>
 
 <template>
@@ -8,12 +8,12 @@ import TheWelcome from './components/Aufgaben.vue'
     <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
 
     <div class="wrapper">
-      <HelloWorld />
+      <LocalStorageView />
     </div>
   </header>
 
   <main>
-    <TheWelcome />
+    <Aufgaben />
   </main>
 </template>
 

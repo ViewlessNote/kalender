@@ -3,22 +3,28 @@ import {ref, watch} from "vue";
 
 const arr = ref([]);
 const today = new Date();
-var now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
+const StorageForm = window.localStorage.getItem("StorageForm");
+const ArrLocalStorage = window.localStorage.getItem("arr");
+const arrAufgaben = ref([]);
 const ref1 = ref({
   name: "",
   Start: new Date(),
   Ende: new Date(),
   Aufgaben: false
 })
+const Aufgabenref = ref({
+  name: "",
+  DeadLine: new Date()
+})
+
+const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
+
 function btnSave() {
      if(!validateDate(window.localStorage.getItem("StorageForm"))){
        return 0
      }
   arr.value.push(window.localStorage.getItem("StorageForm"));
-  console.log(arr);
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
-
-
 }
 
 function FormatDay(){
@@ -28,12 +34,17 @@ function FormatDay(){
   return today.getDate()
 }
 
-const StorageForm = window.localStorage.getItem("StorageForm");
-const ArrLocalStorage = window.localStorage.getItem("arr");
+//Getting data from Aufgabe.vue
+addEventListener("submit", UpdateData)
+function UpdateData(){
+  arrAufgaben.value.push(window.localStorage.getItem("AufgabenForm"));
+  console.log(arrAufgaben.value);
+}
+
 watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
 },{deep:true});
 
-addEventListener("submit", btnSave);
+
 
 
 function validateDate(StrageForm) {
@@ -70,15 +81,11 @@ function validateDate(StrageForm) {
 
     }
 
-
-
-
-
 </script>
 
 <template>
   <h1>Erstelle einen Kalender Eintrage {{now_date}}</h1>
-  <form v-on:submit.prevent="">
+  <form v-on:submit.prevent="" @submit="btnSave">
   <input
   v-model="ref1.name"
   placeholder="Name"
