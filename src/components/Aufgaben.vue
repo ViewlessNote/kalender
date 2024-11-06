@@ -1,17 +1,18 @@
 <script setup>
 import {ref, watch} from "vue";
-import {useToNumber} from "@vueuse/core";
+
+
+var today = new Date();
+const compareDate = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + getDate()+"T"+ today.getHours() + ":" + getMin());
 
 const AufgabenForm = window.localStorage.getItem("AufgabenForm");
 const AufgabenArr = window.localStorage.getItem("arr");
 const arr = ref([]);
 const ref1 = ref({
   name: "",
-  DeadLine: new Date(),
+  DeadLine: compareDate,
   TimeItTakes: 0
 })
-var today = new Date();
-const compareDate = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + getDate()+"T"+ today.getHours() + ":" + getMin());
 
 function getDate(){
   if( today.getDate() < 10){
@@ -33,9 +34,7 @@ function btnSaveAufgabe() {
 
 }
 
-addEventListener("load", () => {
-  document.getElementById("DeadlineInput").value = compareDate;
-})
+
 
 watch(ref1, val => {window.localStorage.setItem("AufgabenForm", JSON.stringify(val));
 },{deep:true});
@@ -65,7 +64,6 @@ watch(ref1, val => {window.localStorage.setItem("AufgabenForm", JSON.stringify(v
         id="DeadlineInput"
         v-model="ref1.DeadLine"
         type="datetime-local"
-
     />
     <button id="AufgabenSave" type="submit" >Save</button>
 
