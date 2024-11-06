@@ -1,6 +1,6 @@
 <script setup>
 import HelloWorld from './components/LocalStorageView.vue'
-import TheWelcome from './components/TheWelcome.vue'
+import TheWelcome from './components/Aufgaben.vue'
 </script>
 
 <template>
