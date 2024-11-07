@@ -2,8 +2,10 @@
 import {ref, watch} from "vue";
 
 
-var today = new Date();
-const compareDate = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + getDate()+"T"+ today.getHours() + ":" + getMin());
+let today = new Date();
+const deadline = new Date();
+deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
+const compareDate = deadline.toISOString().slice(0, 16);
 
 const AufgabenForm = window.localStorage.getItem("AufgabenForm");
 const AufgabenArr = window.localStorage.getItem("arr");
@@ -11,7 +13,9 @@ const arr = ref([]);
 const ref1 = ref({
   name: "",
   DeadLine: compareDate,
-  TimeItTakes: 0
+  TimeItTakes: "00:00",
+  Details: "",
+  aufgabe: true
 })
 
 function getDate(){
@@ -51,12 +55,22 @@ watch(ref1, val => {window.localStorage.setItem("AufgabenForm", JSON.stringify(v
         type="text"
         required
     />
-    <div>Duration</div>
+
     <input
-    v-model="ref1.TimeItTakes"
-    placeholder="1:00"
-    type="time"
-    step="10."
+        v-model="ref1.Details"
+        placeholder="Details"
+        type="text"
+        required
+    />
+    <div>Duration</div>
+
+    <input
+        v-model="ref1.TimeItTakes"
+        placeholder="1:00"
+        type="time"
+        step="10."
+        value="00:00"
+        max=8:00:00
     >
 
     <div>Deadline (*Optional)</div>

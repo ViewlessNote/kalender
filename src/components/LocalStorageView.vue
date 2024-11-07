@@ -1,25 +1,39 @@
 <script setup>
 import {ref, watch} from "vue";
 
-const arr = ref([]);
-const today = new Date();
+
+
+let today = new Date();
+const deadline = new Date();
+deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
+const compareDate = deadline.toISOString().slice(0, 16);
+
+const DayStart = "8:00"
+const DayEnd = "18:00"
+
 const StorageForm = window.localStorage.getItem("StorageForm");
 const ArrLocalStorage = window.localStorage.getItem("arr");
 const arrAufgaben = ref([]);
+const arr = ref([]);
 const ref1 = ref({
   name: "",
   Start: new Date(),
   Ende: new Date(),
-  Aufgaben: false
+  Aufgaben: false,
+  Details: ""
 })
 const Aufgabenref = ref({
   name: "",
-  DeadLine: new Date()
+  DeadLine: compareDate,
+  TimeItTakes: 0,
+  Details: ""
 })
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
 function btnSave() {
+  console.log("2024-11-07T11:00");
+  console.log(compareDate);
      if(!validateDate(window.localStorage.getItem("StorageForm"))){
        return 0
      }
@@ -38,7 +52,29 @@ function FormatDay(){
 addEventListener("submit", UpdateData)
 function UpdateData(){
   arrAufgaben.value.push(window.localStorage.getItem("AufgabenForm"));
-  console.log(arrAufgaben.value);
+  parseAufgabenIntoEvents()
+}
+
+function genEndDate(TiT){
+  var items = TiT.split(":");
+  var hours = Number(items[0]);
+  var minutes = Number(items[1]);
+  var Time = hours * 60 + minutes;
+  let date = new Date()
+  return new Date(date.getTime()+Time*60000)
+}
+
+function parseAufgabenIntoEvents(){
+  for(let item of arrAufgaben.value){
+   let val = JSON.parse(item)
+
+    ref1.value.name = val.name;
+    ref1.value.Start = new Date(compareDate);
+    ref1.value.Ende =  genEndDate(val.TimeItTakes);
+    ref1.value.Aufgaben = val.Aufgaben;
+    ref1.value.Details = val.Details;
+    console.log(ref1)
+  }
 }
 
 watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
@@ -92,20 +128,20 @@ function validateDate(StrageForm) {
   type="text"
   required
   />
+    <div>Von:</div>
 
   <input
+      id="StartDateInput"
       v-model="ref1.Start"
       placeholder="Datum"
       type="datetime-local"
-      min=2024-11-04T12:01
-      max={{JSON.parse(StorageForm).Ende}}
+      min={{compareDate}}
       required
   />
-
+    <div>Bis:</div>
   <input
       v-model="ref1.Ende"
       type="datetime-local"
-      min={{JSON.parse(StorageForm).Start}}
       required
   />
     <button type="submit" >Save</button>
@@ -120,7 +156,13 @@ function validateDate(StrageForm) {
 </template>
 
 <style scoped>
+form {
 
-
+}
+input{
+  flex: 1;
+  padding: 2px;
+  border: 1px dotted black;
+}
 
 </style>
