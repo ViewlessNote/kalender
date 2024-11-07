@@ -1,18 +1,12 @@
 <script setup>
 import {ref, watch} from "vue";
 
+
 let today = new Date();
-let deadline = new Date();
-let compareDate = deadline.toISOString().slice(0, 16);
-function getTimeandDate(){
-  deadline = new Date();
-  deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
-  compareDate = deadline.toISOString().slice(0, 16);
-  today  = new Date();
-  today = today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-  console.log("Time Now is: "+today);
-  return today
-}
+const deadline = new Date();
+deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
+const compareDate = deadline.toISOString().slice(0, 16);
+
 const DayStart = "8:00"
 const DayEnd = "18:00"
 const MaxAufgabenPerDay = 3;
@@ -38,9 +32,9 @@ const Aufgabenref = ref({
 })
 
 setInterval(()=> {
-  getTimeandDate();
+  console.log(compareDate);
  sortEvents();
-}, 1000*30);
+}, 1000*5);
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
@@ -57,6 +51,10 @@ function sortEvents() {
 
   }
 }
+function WriteToArray(newArrayItem){
+  arr.value.push(newArrayItem);
+}
+
 
 function btnSave() {
   console.log("2024-11-07T11:00");
@@ -64,7 +62,7 @@ function btnSave() {
      if(!validateDate(window.localStorage.getItem("StorageForm"))){
        return 0
      }
-  arr.value.push(window.localStorage.getItem("StorageForm"));
+  WriteToArray(window.localStorage.getItem("StorageForm"));
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
 }
 
@@ -88,12 +86,13 @@ function genEndDate(TiT){
   var minutes = Number(items[1]);
   var Time = hours * 60 + minutes;
   let date = new Date()
-  return new Date(date.getTime()+Time*60000)
+  date = date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
+  return new Date(date+Time*60000)
 }
 
 function parseAufgabenIntoEventFormat(item){
    let val = JSON.parse(item)
-  let Start = today.toISOString().slice(0, 16);
+  let Start = compareDate;
   let Ende = new Date(genEndDate(val.TimeItTakes));
   Ende = Ende.toISOString().slice(0, 16);
     let newEintrag= ref1;
@@ -113,12 +112,14 @@ function FindPlaceInKalender(item){
     let item2 = JSON.parse(item)
     let NStart = new Date(item2.Start);
     let NEnde = new Date(item2.Ende);
-    item2.Start = NStart.getTime() + 600000;
-    item2.Ende = NEnde.getTime() + 600000;
+    item2.Start = new Date(NStart.getTime() + 600000).toUTCString().slice(0, 16);
+    item2.Ende = new Date(NEnde.getTime() + 600000).toUTCString().slice(0, 16);
+
+
     console.log(item)
     item = JSON.stringify(item2)
   }
-  arr.value.push(item);
+  WriteToArray(item);
   return true;
 }
 
