@@ -1,15 +1,22 @@
 <script setup>
 import {ref, watch} from "vue";
 
-
-
 let today = new Date();
-const deadline = new Date();
-deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
-const compareDate = deadline.toISOString().slice(0, 16);
-
+let deadline = new Date();
+let compareDate = deadline.toISOString().slice(0, 16);
+function getTimeandDate(){
+  deadline = new Date();
+  deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
+  compareDate = deadline.toISOString().slice(0, 16);
+  today  = new Date();
+  today = today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+  console.log("Time Now is: "+today);
+  return today
+}
 const DayStart = "8:00"
 const DayEnd = "18:00"
+const MaxAufgabenPerDay = 3;
+let AufgabenToday = 0;
 
 const StorageForm = window.localStorage.getItem("StorageForm");
 const ArrLocalStorage = window.localStorage.getItem("arr");
@@ -20,6 +27,7 @@ const ref1 = ref({
   Start: new Date(),
   Ende: new Date(),
   Aufgaben: false,
+  AufgabeAktiv:false,
   Details: ""
 })
 const Aufgabenref = ref({
@@ -29,7 +37,26 @@ const Aufgabenref = ref({
   Details: ""
 })
 
+setInterval(()=> {
+  getTimeandDate();
+ sortEvents();
+}, 1000*30);
+
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
+
+function sortEvents() {
+  for (let item of arr.value) {
+    item = JSON.parse(item);
+    if (item.AufgabeAktiv === true ){
+      if (item.Start < compareDate){
+        if(FindPlaceInKalender(JSON.stringify(item))){
+          console.log("NoDateFound")
+        }
+      }
+    }
+
+  }
+}
 
 function btnSave() {
   console.log("2024-11-07T11:00");
@@ -51,8 +78,8 @@ function FormatDay(){
 //Getting data from Aufgabe.vue
 addEventListener("submit", UpdateData)
 function UpdateData(){
-  arrAufgaben.value.push(window.localStorage.getItem("AufgabenForm"));
-  parseAufgabenIntoEvents()
+  parseAufgabenIntoEventFormat(window.localStorage.getItem("AufgabenForm"))
+  console.log(window.localStorage.getItem("AufgabenForm"))
 }
 
 function genEndDate(TiT){
@@ -64,17 +91,35 @@ function genEndDate(TiT){
   return new Date(date.getTime()+Time*60000)
 }
 
-function parseAufgabenIntoEvents(){
-  for(let item of arrAufgaben.value){
+function parseAufgabenIntoEventFormat(item){
    let val = JSON.parse(item)
-
-    ref1.value.name = val.name;
-    ref1.value.Start = new Date(compareDate);
-    ref1.value.Ende =  genEndDate(val.TimeItTakes);
-    ref1.value.Aufgaben = val.Aufgaben;
-    ref1.value.Details = val.Details;
-    console.log(ref1)
+  let Start = today.toISOString().slice(0, 16);
+  let Ende = new Date(genEndDate(val.TimeItTakes));
+  Ende = Ende.toISOString().slice(0, 16);
+    let newEintrag= ref1;
+    newEintrag.value.name = val.name;
+    newEintrag.value.Start = Start;
+    newEintrag.value.Ende =  Ende;
+    newEintrag.value.Aufgaben = true;
+    newEintrag.value.Details = val.Details;
+    newEintrag.value.AufgabeAktiv = true;
+    console.log(newEintrag.value)
+    FindPlaceInKalender(JSON.stringify(newEintrag.value));
   }
+
+function FindPlaceInKalender(item){
+  console.log(item)
+  while(!validateDate(item)){
+    let item2 = JSON.parse(item)
+    let NStart = new Date(item2.Start);
+    let NEnde = new Date(item2.Ende);
+    item2.Start = NStart.getTime() + 600000;
+    item2.Ende = NEnde.getTime() + 600000;
+    console.log(item)
+    item = JSON.stringify(item2)
+  }
+  arr.value.push(item);
+  return true;
 }
 
 watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
@@ -83,9 +128,10 @@ watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(va
 
 
 
-function validateDate(StrageForm) {
-  const Start = JSON.parse(StrageForm).Start;
-  const Ende = JSON.parse(StrageForm).Ende;
+function validateDate(itemForm) {
+  console.log(itemForm);
+  const Start = JSON.parse(itemForm).Start;
+  const Ende = JSON.parse(itemForm).Ende;
 
       if(Ende < Start){
         alert("Das Ende des Termins Liegt vor seinem Startpunkt")
@@ -149,7 +195,7 @@ function validateDate(StrageForm) {
   </form>
 
   <ul v-for="x in arr" key="{{x}}">
-    <li>{{JSON.parse(x).name}} Start:{{JSON.parse(x).Start}} Ende:{{JSON.parse(x).Ende}}</li>
+    <li>{{JSON.parse(x).name}}</li> <li>Start:{{JSON.parse(x).Start}}</li> <li>Ende:{{JSON.parse(x).Ende}}</li>
 
   </ul>
 
