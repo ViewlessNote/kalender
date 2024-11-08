@@ -110,10 +110,10 @@ function FindPlaceInKalender(item){
   console.log(item)
   while(!validateDate(item)){
     let item2 = JSON.parse(item)
-    let NStart = new Date(item2.Start);
-    let NEnde = new Date(item2.Ende);
-    item2.Start = new Date(NStart.getTime() + 600000).toUTCString().slice(0, 16);
-    item2.Ende = new Date(NEnde.getTime() + 600000).toUTCString().slice(0, 16);
+    let NStart = item2.Start;
+    let NEnde = item2.Ende;
+    item2.Start = item2.Start.setMinutes(item2.Start.getMinutes() - item2.Start.getTimezoneOffset());
+    item2.Ende = item2.Ende.setMinutes(item2.Ende.getMinutes() - item2.Ende.getTimezoneOffset());
 
 
     console.log(item)
