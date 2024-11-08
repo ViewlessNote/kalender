@@ -3,9 +3,15 @@ import {ref, watch} from "vue";
 
 
 let today = new Date();
-const deadline = new Date();
+let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
-const compareDate = deadline.toISOString().slice(0, 16);
+let compareDate = deadline.toISOString().slice(0, 16);
+
+function comareDateUpdate(){
+  let newDay = new Date()
+  newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset());
+  compareDate = newDay.toISOString().slice(0, 16);
+}
 
 const DayStart = "8:00"
 const DayEnd = "18:00"
@@ -32,23 +38,24 @@ const Aufgabenref = ref({
 })
 
 setInterval(()=> {
-  console.log(compareDate);
+  comareDateUpdate()
  sortEvents();
-}, 1000*5);
+}, 1000*30);
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
 function sortEvents() {
-  for (let item of arr.value) {
-    item = JSON.parse(item);
+  if (arr.value.length<1) {return}
+  for (let i = 0; i <= arr.value.length; i++) {
+    let item = JSON.parse(arr.value[i]);
+    arr.value.splice(i, 1);
     if (item.AufgabeAktiv === true ){
       if (item.Start < compareDate){
         if(FindPlaceInKalender(JSON.stringify(item))){
-          console.log("NoDateFound")
+          console.log("DateFound")
         }
       }
     }
-
   }
 }
 function WriteToArray(newArrayItem){
@@ -95,7 +102,7 @@ function parseAufgabenIntoEventFormat(item){
   let Start = compareDate;
   let Ende = new Date(genEndDate(val.TimeItTakes));
   Ende = Ende.toISOString().slice(0, 16);
-    let newEintrag= ref1;
+    let newEintrag = ref1;
     newEintrag.value.name = val.name;
     newEintrag.value.Start = Start;
     newEintrag.value.Ende =  Ende;
@@ -110,13 +117,13 @@ function FindPlaceInKalender(item){
   console.log(item)
   while(!validateDate(item)){
     let item2 = JSON.parse(item)
-    let NStart = item2.Start;
-    let NEnde = item2.Ende;
-    item2.Start = item2.Start.setMinutes(item2.Start.getMinutes() - item2.Start.getTimezoneOffset());
-    item2.Ende = item2.Ende.setMinutes(item2.Ende.getMinutes() - item2.Ende.getTimezoneOffset());
+    let NStart = new Date(item2.Start+"Z");
+    let NEnde = new Date(item2.Ende+"Z");
+    NStart.setMinutes(NStart.getMinutes() +1 );
+    NEnde.setMinutes(NEnde.getMinutes()+1);
+    item2.Start = NStart.toISOString().slice(0, 16);
+    item2.Ende = NEnde.toISOString().slice(0, 16);
 
-
-    console.log(item)
     item = JSON.stringify(item2)
   }
   WriteToArray(item);
@@ -140,6 +147,12 @@ function validateDate(itemForm) {
         return false;
       }
 
+      if (Start < compareDate){
+        //Wenn eine aufgabe noch nicht abgehackt wurde
+        console.log("Aufgabe nicht erledigt, sie wurde weiter geschoben")
+        return false;
+      }
+
       for (let item of arr.value){
         let OStart =JSON.parse(item).Start;
         let OEnde =JSON.parse(item).Ende;
@@ -147,15 +160,15 @@ function validateDate(itemForm) {
           console.log("Start ist Gröser als O Start")
         }
         if(Start === OStart || Ende === OEnde){
-          alert("Deine eingegebene Start/Ende zeit ist schon belegt")
+
           return false;
         }
         if (Ende > OStart && Ende < OEnde){
-          alert("Zeitraum schon belegt (Ende drin)")
+
           return false;
         }
         if (Start > OStart && Start < OEnde){
-          alert("Zeitraum schon belegt (Strat drin)")
+
           return false;
         }
 
@@ -170,6 +183,7 @@ function validateDate(itemForm) {
   <h1>Erstelle einen Kalender Eintrage {{now_date}}</h1>
   <form v-on:submit.prevent="" @submit="btnSave">
   <input
+
   v-model="ref1.name"
   placeholder="Name"
   type="text"
