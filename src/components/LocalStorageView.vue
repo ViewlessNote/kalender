@@ -2,12 +2,14 @@
 import {ref, watch} from "vue";
 
 
+
+
 let today = new Date();
 let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
 let compareDate = deadline.toISOString().slice(0, 16);
 
-function comareDateUpdate(){
+function CompareDateUpdate(){
   let newDay = new Date()
   newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset());
   compareDate = newDay.toISOString().slice(0, 16);
@@ -38,15 +40,15 @@ const Aufgabenref = ref({
 })
 
 setInterval(()=> {
-  comareDateUpdate()
+  CompareDateUpdate()
  sortEvents();
-}, 1000*30);
+}, 1000*10);
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
 function sortEvents() {
   if (arr.value.length<1) {return}
-  for (let i = 0; i <= arr.value.length; i++) {
+  for (let i = 0; i <= arr.value.length-1; i++) {
     let item = JSON.parse(arr.value[i]);
     if (item.AufgabeAktiv === true ){
       if (item.Start < compareDate){
@@ -60,6 +62,12 @@ function sortEvents() {
 }
 function WriteToArray(newArrayItem){
   arr.value.push(newArrayItem);
+  ref1.value.name = "";
+  ref1.value.Start= new Date();
+  ref1.value.Ende= new Date();
+  ref1.value.Aufgaben= false;
+  ref1.value.AufgabeAktiv=false;
+  ref1.value.Details= ""
 }
 
 
@@ -85,13 +93,14 @@ addEventListener("submit", UpdateData)
 function UpdateData(){
   parseAufgabenIntoEventFormat(window.localStorage.getItem("AufgabenForm"))
   console.log(window.localStorage.getItem("AufgabenForm"))
+
 }
 
 function genEndDate(TiT){
-  var items = TiT.split(":");
-  var hours = Number(items[0]);
-  var minutes = Number(items[1]);
-  var Time = hours * 60 + minutes;
+  let items = TiT.split(":");
+  let hours = Number(items[0]);
+  let minutes = Number(items[1]);
+  let Time = hours * 60 + minutes;
   let date = new Date()
   date = date.setMinutes(date.getMinutes() - date.getTimezoneOffset())
   return new Date(date+Time*60000)
@@ -111,6 +120,7 @@ function parseAufgabenIntoEventFormat(item){
     newEintrag.value.AufgabeAktiv = true;
     console.log(newEintrag.value)
     FindPlaceInKalender(JSON.stringify(newEintrag.value));
+
   }
 
 function FindPlaceInKalender(item){
@@ -132,7 +142,6 @@ function FindPlaceInKalender(item){
 
 watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
 },{deep:true});
-
 
 
 
@@ -168,14 +177,17 @@ function validateDate(itemForm) {
           return false;
         }
         if (Start > OStart && Start < OEnde){
-
           return false;
         }
-
       }
       return true;
-
     }
+function CheckAufAufgabe(x){
+  document.getElementById(x).disabled=true;
+  return "checked"
+}
+
+
 
 </script>
 
@@ -209,8 +221,12 @@ function validateDate(itemForm) {
 
   </form>
 
-  <ul v-for="x in arr" key="{{x}}">
-    <li>{{JSON.parse(x).name}}</li> <li>Start:{{JSON.parse(x).Start}}</li> <li>Ende:{{JSON.parse(x).Ende}}</li>
+  <ul  v-for="x in arr" key="{{x}}">
+    <li>{{JSON.parse(x).name}}</li>
+    <li>Start:{{JSON.parse(x).Start}}</li>
+    <li>Ende:{{JSON.parse(x).Ende}}</li>
+    <li>Aufgabe: <input id={{JSON.parse(x).id}} type="checkbox" value="{{}}"></li>
+
 
   </ul>
 

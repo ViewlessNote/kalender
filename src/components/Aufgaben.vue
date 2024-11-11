@@ -35,7 +35,6 @@ function btnSaveAufgabe() {
 
   arr.value.push(window.localStorage.getItem("AufgabenForm"));
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
-
 }
 
 
