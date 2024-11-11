@@ -79,6 +79,7 @@ function btnSave() {
      }
   WriteToArray(window.localStorage.getItem("StorageForm"));
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
+  CheckAufAufgabe();
 }
 
 function FormatDay(){
@@ -187,9 +188,11 @@ function validateDate(itemForm) {
       }
       return true;
     }
-function CheckAufAufgabe(x){
-  document.getElementById(x.value).checked = true;
-  return "checked"
+function CheckAufAufgabe(){
+  for(let x of arr.value){
+    document.getElementById("E").checked = true;
+  }
+
 }
 
 
@@ -230,7 +233,7 @@ function CheckAufAufgabe(x){
     <li>{{JSON.parse(x).name}}</li>
     <li>Start:{{JSON.parse(x).Start}}</li>
     <li>Ende:{{JSON.parse(x).Ende}}</li>
-    <li>Aufgabe: <input id={{x.value}} type="checkbox" value="{{CheckAufAufgabe(x.value)}}"></li>
+    <li>Aufgabe: <input id="E" type="checkbox"></li>
 
 
   </ul>
