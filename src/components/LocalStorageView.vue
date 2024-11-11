@@ -72,10 +72,10 @@ function WriteToArray(newArrayItem){
 
 
 function btnSave() {
-  console.log("2024-11-07T11:00");
   console.log(compareDate);
      if(!validateDate(window.localStorage.getItem("StorageForm"))){
-       return 0
+      alert("Wrong Input or date is occupied")
+       return ;
      }
   WriteToArray(window.localStorage.getItem("StorageForm"));
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
@@ -91,8 +91,13 @@ function FormatDay(){
 //Getting data from Aufgabe.vue
 addEventListener("submit", UpdateData)
 function UpdateData(){
+  let Data= window.localStorage.getItem("AufgabenForm");
+  if (JSON.parse(Data).name === ""){
+    return
+  }
   parseAufgabenIntoEventFormat(window.localStorage.getItem("AufgabenForm"))
-  console.log(window.localStorage.getItem("AufgabenForm"))
+  console.log(window.localStorage.getItem("AufgabenForm"));
+  window.localStorage.setItem("AufgabenForm", JSON.stringify(""));
 
 }
 
@@ -183,7 +188,7 @@ function validateDate(itemForm) {
       return true;
     }
 function CheckAufAufgabe(x){
-  document.getElementById(x).disabled=true;
+  document.getElementById(x.value).checked = true;
   return "checked"
 }
 
@@ -225,7 +230,7 @@ function CheckAufAufgabe(x){
     <li>{{JSON.parse(x).name}}</li>
     <li>Start:{{JSON.parse(x).Start}}</li>
     <li>Ende:{{JSON.parse(x).Ende}}</li>
-    <li>Aufgabe: <input id={{JSON.parse(x).id}} type="checkbox" value="{{}}"></li>
+    <li>Aufgabe: <input id={{x.value}} type="checkbox" value="{{CheckAufAufgabe(x.value)}}"></li>
 
 
   </ul>
@@ -239,7 +244,7 @@ form {
 input{
   flex: 1;
   padding: 2px;
-  border: 1px dotted black;
+  border: 2px dotted black;
 }
 
 </style>

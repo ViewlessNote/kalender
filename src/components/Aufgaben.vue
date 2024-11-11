@@ -35,7 +35,13 @@ function btnSaveAufgabe() {
 
   arr.value.push(window.localStorage.getItem("AufgabenForm"));
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
-}
+  setTimeout(()=>{
+    ref1.value.name = "";
+    ref1.value.DeadLine = compareDate;
+    ref1.value.TimeItTakes = "00:00";
+    ref1.value.Details = "";
+    ref1.value.aufgabe = true},1)
+  }
 
 
 
