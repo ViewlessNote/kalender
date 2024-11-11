@@ -48,9 +48,9 @@ function sortEvents() {
   if (arr.value.length<1) {return}
   for (let i = 0; i <= arr.value.length; i++) {
     let item = JSON.parse(arr.value[i]);
-    arr.value.splice(i, 1);
     if (item.AufgabeAktiv === true ){
       if (item.Start < compareDate){
+        arr.value.splice(i, 1);
         if(FindPlaceInKalender(JSON.stringify(item))){
           console.log("DateFound")
         }
