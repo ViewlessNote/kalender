@@ -1,9 +1,6 @@
 <script setup>
 import {ref, watch} from "vue";
 
-
-
-
 let today = new Date();
 let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
@@ -13,6 +10,12 @@ function CompareDateUpdate(){
   let newDay = new Date()
   newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset());
   compareDate = newDay.toISOString().slice(0, 16);
+}
+
+function StandartEndTime(){
+  let newDay = new Date()
+  newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset() + 60);
+  return newDay.toISOString().slice(0, 16);
 }
 
 const DayStart = "8:00"
@@ -25,12 +28,13 @@ const ArrLocalStorage = window.localStorage.getItem("arr");
 const arrAufgaben = ref([]);
 const arr = ref([]);
 const ref1 = ref({
+  id: 0,
   name: "",
-  Start: new Date(),
-  Ende: new Date(),
+  Details: "",
+  Start: compareDate,
+  Ende: StandartEndTime(),
   Aufgaben: false,
-  AufgabeAktiv:false,
-  Details: ""
+  AufgabeAktiv:false
 })
 const Aufgabenref = ref({
   name: "",
@@ -50,7 +54,8 @@ function sortEvents() {
   if (arr.value.length<1) {return}
   for (let i = 0; i <= arr.value.length-1; i++) {
     let item = JSON.parse(arr.value[i]);
-    if (item.AufgabeAktiv === true ){
+    if (item.DeadLine < compareDate) {
+     if (item.AufgabeAktiv === true ){
       if (item.Start < compareDate){
         arr.value.splice(i, 1);
         if(FindPlaceInKalender(JSON.stringify(item))){
@@ -59,13 +64,18 @@ function sortEvents() {
       }
     }
   }
+  }
+  arr.value.sort((x, y) => {
+    return new Date(x.Start) > new Date(y.Start) ? 1 : -1})
 }
 function WriteToArray(newArrayItem){
+  JSON.parse(newArrayItem).id = arr.value.length;
+  JSON.stringify(newArrayItem)
   arr.value.push(newArrayItem);
   ref1.value.name = "";
-  ref1.value.Start= new Date();
-  ref1.value.Ende= new Date();
-  ref1.value.Aufgaben= false;
+  ref1.value.Start= compareDate;
+  ref1.value.Ende= StandartEndTime();
+  ref1.value.Aufgaben = false;
   ref1.value.AufgabeAktiv=false;
   ref1.value.Details= ""
 }
@@ -168,6 +178,13 @@ function validateDate(itemForm) {
         return false;
       }
 
+      if(JSON.parse(itemForm).Aufgaben === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00"){
+        return false;
+      }
+      if(JSON.parse(itemForm).Aufgaben === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00"){
+       return false;
+      }
+
       for (let item of arr.value){
         let OStart =JSON.parse(item).Start;
         let OEnde =JSON.parse(item).Ende;
@@ -175,27 +192,38 @@ function validateDate(itemForm) {
           console.log("Start ist Gröser als O Start")
         }
         if(Start === OStart || Ende === OEnde){
+          if (JSON.parse(item).Aufgaben === true && JSON.parse(itemForm).Aufgaben === false){
+            arr.value.splice(JSON.parse(item).id-1, 1);
+            setTimeout(() =>{
+              FindPlaceInKalender(item);
+            },1)
+          }else{return false;}
 
-          return false;
         }
         if (Ende > OStart && Ende < OEnde){
-
-          return false;
+          if (JSON.parse(item).Aufgaben === true && JSON.parse(itemForm).Aufgaben === false){
+            arr.value.splice(JSON.parse(item).id-1, 1);
+            setTimeout(() =>{
+              FindPlaceInKalender(item);
+            },1)
+          }else{return false;}
         }
         if (Start > OStart && Start < OEnde){
-          return false;
+          if (JSON.parse(item).Aufgaben === true && JSON.parse(itemForm).Aufgaben === false){
+            arr.value.splice(JSON.parse(item).id-1, 1);
+            setTimeout(() =>{
+              FindPlaceInKalender(item);
+            },1)
+          }else{return false;}
         }
       }
       return true;
     }
 function CheckAufAufgabe(){
   for(let x of arr.value){
-    document.getElementById("E").checked = true;
+    document.getElementById(JSON.parse(x).id).checked = true;
   }
-
 }
-
-
 
 </script>
 
@@ -209,6 +237,12 @@ function CheckAufAufgabe(){
   type="text"
   required
   />
+    <input
+        v-model="ref1.Details"
+        placeholder="Details"
+        type="text"
+        required
+    />
     <div>Von:</div>
 
   <input
@@ -233,9 +267,7 @@ function CheckAufAufgabe(){
     <li>{{JSON.parse(x).name}}</li>
     <li>Start:{{JSON.parse(x).Start}}</li>
     <li>Ende:{{JSON.parse(x).Ende}}</li>
-    <li>Aufgabe: <input id="E" type="checkbox"></li>
-
-
+    <li> Aufgabe: <input id={{JSON.parse(x).id}} type="checkbox" ></li>
   </ul>
 
 </template>

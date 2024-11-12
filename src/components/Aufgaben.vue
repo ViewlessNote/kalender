@@ -1,35 +1,31 @@
 <script setup >
 import {ref, watch} from "vue";
 
-
-let today = new Date();
-const deadline = new Date();
+let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
-const compareDate = deadline.toISOString().slice(0, 16);
+let compareDate = deadline.toISOString().slice(0, 16);
 
+function CompareDateUpdate(){
+  let newDay = new Date()
+  newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset());
+  compareDate = newDay.toISOString().slice(0, 16);
+}
+
+function StandartEndTime(){
+  let newDay = new Date()
+  newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset() + 60);
+  return newDay.toISOString().slice(0, 16);
+}
 const AufgabenForm = window.localStorage.getItem("AufgabenForm");
 const AufgabenArr = window.localStorage.getItem("arr");
 const arr = ref([]);
 const ref1 = ref({
   name: "",
-  DeadLine: compareDate,
-  TimeItTakes: "00:00",
+  DeadLine: StandartEndTime(),
+  TimeItTakes: "01:00",
   Details: "",
-  aufgabe: true
+  Aufgaben: true
 })
-
-function getDate(){
-  if( today.getDate() < 10){
-    return '0'+today.getDate()
-  }
-  return  today.getDate()
-}
-function getMin(){
-  if( today.getMinutes() < 10){
-    return '0'+today.getMinutes()
-  }
-  return  today.getMinutes()
-}
 
 function btnSaveAufgabe() {
 
@@ -37,8 +33,8 @@ function btnSaveAufgabe() {
   window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
   setTimeout(()=>{
     ref1.value.name = "";
-    ref1.value.DeadLine = compareDate;
-    ref1.value.TimeItTakes = "00:00";
+    ref1.value.DeadLine = StandartEndTime();
+    ref1.value.TimeItTakes = "01:00";
     ref1.value.Details = "";
     ref1.value.aufgabe = true},1)
   }
