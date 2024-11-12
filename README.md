@@ -1,4 +1,5 @@
-## This Project has a front and backend and needs Symfony and npm installed
+## Kalender
+This Project has a front and backend and needs Symfony and npm installed
 
 Goal of this project is that i leanr a bunch of knoledg about Front and Backend Development.
 
