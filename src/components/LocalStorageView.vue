@@ -44,6 +44,7 @@ const Aufgabenref = ref({
 })
 
 setInterval(()=> {
+  FetchData();
   CompareDateUpdate()
  sortEvents();
 }, 1000*10);
@@ -223,6 +224,17 @@ function CheckAufAufgabe(){
   for(let x of arr.value){
     document.getElementById(JSON.parse(x).id).checked = true;
   }
+}
+
+function FetchData(){
+  fetch('http://localhost:8000/route', {
+    method: 'GET',
+
+  }).then(response => {
+    response.json().then(res => console.log(res));
+}).catch(err=> {
+  console.log(err)
+  })
 }
 
 </script>
