@@ -68,10 +68,18 @@ function sortEvents() {
   arr.value.sort((x, y) => {
     return new Date(x.Start) > new Date(y.Start) ? 1 : -1})
 }
+
 function WriteToArray(newArrayItem){
   JSON.parse(newArrayItem).id = arr.value.length;
-  JSON.stringify(newArrayItem)
+  JSON.stringify(newArrayItem);
   arr.value.push(newArrayItem);
+  requestOptions.body = newArrayItem
+  fetch('http://127.0.0.1:8000/setTermin/', {
+    method: 'POST',
+    body: newArrayItem
+  })
+      .then(response => console.log(response.json()))
+
   ref1.value.name = "";
   ref1.value.Start= compareDate;
   ref1.value.Ende= StandartEndTime();
