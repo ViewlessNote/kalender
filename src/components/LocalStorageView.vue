@@ -33,8 +33,8 @@ const ref1 = ref({
   Details: "",
   Start: compareDate,
   Ende: StandartEndTime(),
-  Aufgaben: false,
-  Aktiv:false
+  aufgabe: false,
+  aktiv:false
 })
 const Aufgabenref = ref({
   name: "",
@@ -55,7 +55,7 @@ function sortEvents() {
   for (let i = 0; i <= arr.value.length-1; i++) {
     let item = JSON.parse(arr.value[i]);
     if (item.DeadLine < compareDate) {
-     if (item.AufgabeAktiv === true ){
+     if (item.aufgabe === true ){
       if (item.Start < compareDate){
         arr.value.splice(i, 1);
         if(FindPlaceInKalender(JSON.stringify(item))){
@@ -70,8 +70,10 @@ function sortEvents() {
 }
 
 function WriteToArray(newArrayItem){
+  console.log("WriteToArray")
   JSON.parse(newArrayItem).id = arr.value.length;
   JSON.stringify(newArrayItem);
+  console.log(newArrayItem)
   arr.value.push(newArrayItem);
   fetch('http://127.0.0.1:8000/setTermin', {
     method: 'POST',
@@ -82,8 +84,8 @@ function WriteToArray(newArrayItem){
   ref1.value.name = "";
   ref1.value.Start= compareDate;
   ref1.value.Ende= StandartEndTime();
-  ref1.value.Aufgaben = false;
-  ref1.value.Aktiv=false;
+  ref1.value.aufgabe = false;
+  ref1.value.aktiv=false;
   ref1.value.Details= ""
 }
 
@@ -138,9 +140,9 @@ function parseAufgabenIntoEventFormat(item){
     newEintrag.value.name = val.name;
     newEintrag.value.Start = Start;
     newEintrag.value.Ende =  Ende;
-    newEintrag.value.Aufgaben = true;
+    newEintrag.value.aufgabe = true;
     newEintrag.value.Details = val.Details;
-    newEintrag.value.Aktiv = true;
+    newEintrag.value.aktiv = true;
     console.log(newEintrag.value)
     FindPlaceInKalender(JSON.stringify(newEintrag.value));
 
