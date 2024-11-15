@@ -25,20 +25,19 @@ class ControllerClass extends AbstractController
         $this->terminService = $terminService;
     }
 
-    #[Route('/setTermin', name:'setTermin', methods: ['post'])]
+    #[Route('/setTermin', name:'setTermin', methods: ['POST'])]
     public function MakeTermine(Request $request): JsonResponse
     {
         $newTermin = new Termin();
 
     $newTermin = $this->serializer->deserialize($request->getContent(), Termin::class, 'json');
-
         $this->terminService->setNew($newTermin);
         return new JsonResponse($newTermin);
     }
-    #[Route('/Termine')]
-    public function GetTermine(): JsonResponse
-    {
-        return new JsonResponse($this->terminService->getAll());
-    }
 
+    #[Route('/getTermin/{id}', name:'getTermin', methods: ['GET'])]
+    public function getTermine(Request $request, int $id): JsonResponse
+    {
+    $this->terminService->getTermin($id);
+    }
 }

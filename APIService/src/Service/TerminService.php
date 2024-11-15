@@ -16,4 +16,9 @@ class TerminService
         $this->terminRepository->setNewTermin($termin);
         return;
     }
+
+    public function getTermin(int $id){
+
+    return $this->terminRepository->getTermin($id);
+    }
 }

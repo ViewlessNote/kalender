@@ -18,7 +18,12 @@ class TerminRepository extends ServiceEntityRepository
     public function setNewTermin(termin $termin){
          $this->em->persist($termin);
          $this->em->flush();
+         return $termin;
+    }
 
+    public function getTermin(int $id){
+
+       return $this-em->find($id);
     }
 
     //    /**
