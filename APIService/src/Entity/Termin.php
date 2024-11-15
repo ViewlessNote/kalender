@@ -17,10 +17,10 @@ class Termin
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: "datetime")]
     private ?\DateTimeInterface $Start = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: "datetime")]
     private ?\DateTimeInterface $Ende = null;
 
     #[ORM\Column]

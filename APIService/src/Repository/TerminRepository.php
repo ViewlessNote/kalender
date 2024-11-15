@@ -16,10 +16,24 @@ class TerminRepository extends ServiceEntityRepository
         parent::__construct($registry, Termin::class);
     }
     public function setNewTermin(termin $termin){
-         $this->em->persist($termin);
-         $this->em->flush();
-
+        $this->em->persist($termin);
+        $this->em->flush();
     }
+    public function getTermin(int $id){
+        return$this->find($id);
+    }
+    public function getTermine(){
+        return $this->em->getRepository(Termin::class)->findAll();
+    }
+    public function deleteTermin(int $id){
+        $this->em->remove($this->getTermin($id));
+        $this->em->flush();
+    }
+    public function updateTermin(int $id, termin $termin){
+        $this->em->persist($this->getTermin($id));
+        $this->em->flush();
+    }
+
 
     //    /**
     //     * @return Termin[] Returns an array of Termin objects

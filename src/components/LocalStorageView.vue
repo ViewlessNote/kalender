@@ -50,6 +50,30 @@ setInterval(()=> {
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
+function fetchall(){
+  arr.value = [];
+  let Termine
+  fetch('http://127.0.0.1:8000/Termine', {
+    method: 'GET',
+  })
+      .then(function(response) {
+        return response.json();
+      })
+      .then(function(data) {
+         Termine = JSON.parse(data)
+        console.log(Termine.length)
+        for (let i = 0; i < Termine.length; i++){
+          let S = new Date(Termine[i].Start)
+          let E = new Date(Termine[i].Ende)
+          E.toISOString().slice(0,16)
+          S.toISOString().slice(0,16)
+          Termine[i].Start = S
+         Termine[i].Ende = E
+          arr.value.push(JSON.stringify(Termine[i]))
+        }
+        return Termine;
+      })
+}
 function sortEvents() {
   if (arr.value.length<1) {return}
   for (let i = 0; i <= arr.value.length-1; i++) {
@@ -74,7 +98,6 @@ function WriteToArray(newArrayItem){
   JSON.parse(newArrayItem).id = arr.value.length;
   JSON.stringify(newArrayItem);
   console.log(newArrayItem)
-  arr.value.push(newArrayItem);
   fetch('http://127.0.0.1:8000/setTermin', {
     method: 'POST',
     body: newArrayItem
@@ -269,8 +292,9 @@ function CheckAufAufgabe(){
       required
   />
     <button type="submit" >Save</button>
-
+    <button @click="fetchall()" >Reload</button>
   </form>
+
 
   <ul  v-for="x in arr" key="{{x}}">
     <li>{{JSON.parse(x).name}}</li>

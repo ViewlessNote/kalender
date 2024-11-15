@@ -25,20 +25,46 @@ class ControllerClass extends AbstractController
         $this->terminService = $terminService;
     }
 
-    #[Route('/setTermin', name:'setTermin', methods: ['post'])]
+    //POST
+    #[Route('/setTermin', name:'setTermin', methods: ['POST'])]
     public function MakeTermine(Request $request): JsonResponse
     {
         $newTermin = new Termin();
 
-    $newTermin = $this->serializer->deserialize($request->getContent(), Termin::class, 'json');
+        $newTermin = $this->serializer->deserialize($request->getContent(), Termin::class, 'json');
 
         $this->terminService->setNew($newTermin);
         return new JsonResponse($newTermin);
     }
-    #[Route('/Termine')]
-    public function GetTermine(): JsonResponse
+    //GET
+    #[Route('/Termine',methods: ['GET'])]
+    public function getTermine(): JsonResponse
     {
-        return new JsonResponse($this->terminService->getAll());
+        $data = $this->serializer->serialize($this->terminService->getTermine(), 'json');
+        return new JsonResponse($data);
+    }
+
+    #[Route('/Termin/{id}', methods: ['GET'])]
+    public function getTermin(int $id):JsonResponse
+    {
+        $data = $this->serializer->serialize($this->terminService->getTermin($id), 'json');
+        return new JsonResponse($data);
+    }
+    //PUT
+    #[Route('/Termin/{id}/change', methods: ['PUT'])]
+    public function changeTermin(int $id, Request $request):JsonResponse
+    {
+        $newTermin = new Termin();
+
+        $newTermin = $this->serializer->deserialize($request->getContent(), Termin::class, 'json');
+
+        $this->terminService->updateTermin($id,$newTermin);
+    }
+    //DELETE
+    #[Route('/Termin/{id}', methods: ['DELETE'])]
+    public function delTermin(int $id):JsonResponse
+    {
+        $this->terminService->deleteTermin($id);
     }
 
 }
