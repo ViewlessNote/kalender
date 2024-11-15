@@ -1,15 +1,18 @@
 <?php
+namespace App\Service;
 use App\Entity\Termin;
-use APP\Repository\TerminRepository;
-class TerminService{
+use App\Repository\TerminRepository;
+
+class TerminService
+{
     private TerminRepository $terminRepository;
     function __construct(TerminRepository $terminRepository){
         $this->terminRepository = $terminRepository;
     }
-    function getAll(){
+    public function getAll(){
         return $this->terminRepository->findAll();
     }
-    function setNew(Termin $termin){
+    public function setNew(Termin $termin){
         $this->terminRepository->setNewTermin($termin);
         return;
     }

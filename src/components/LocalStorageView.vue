@@ -34,7 +34,7 @@ const ref1 = ref({
   Start: compareDate,
   Ende: StandartEndTime(),
   Aufgaben: false,
-  AufgabeAktiv:false
+  Aktiv:false
 })
 const Aufgabenref = ref({
   name: "",
@@ -73,8 +73,7 @@ function WriteToArray(newArrayItem){
   JSON.parse(newArrayItem).id = arr.value.length;
   JSON.stringify(newArrayItem);
   arr.value.push(newArrayItem);
-  requestOptions.body = newArrayItem
-  fetch('http://127.0.0.1:8000/setTermin/', {
+  fetch('http://127.0.0.1:8000/setTermin', {
     method: 'POST',
     body: newArrayItem
   })
@@ -84,7 +83,7 @@ function WriteToArray(newArrayItem){
   ref1.value.Start= compareDate;
   ref1.value.Ende= StandartEndTime();
   ref1.value.Aufgaben = false;
-  ref1.value.AufgabeAktiv=false;
+  ref1.value.Aktiv=false;
   ref1.value.Details= ""
 }
 
@@ -141,7 +140,7 @@ function parseAufgabenIntoEventFormat(item){
     newEintrag.value.Ende =  Ende;
     newEintrag.value.Aufgaben = true;
     newEintrag.value.Details = val.Details;
-    newEintrag.value.AufgabeAktiv = true;
+    newEintrag.value.Aktiv = true;
     console.log(newEintrag.value)
     FindPlaceInKalender(JSON.stringify(newEintrag.value));
 
