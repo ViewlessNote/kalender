@@ -257,6 +257,16 @@ function CheckAufAufgabe(){
   }
 }
 
+Date.prototype.getWeek = function() {
+  var onejan = new Date(this.getFullYear(), 0, 1);
+  return Math.ceil((((this - onejan) / 86400000) + onejan.getDay() + 1) / 7);
+}
+
+let weekNumber = (new Date()).getWeek();
+
+var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
+
 </script>
 
 <template>
@@ -306,13 +316,5 @@ function CheckAufAufgabe(){
 </template>
 
 <style scoped>
-form {
-
-}
-input{
-  flex: 1;
-  padding: 2px;
-  border: 2px dotted black;
-}
 
 </style>

@@ -50,6 +50,7 @@ watch(ref1, val => {window.localStorage.setItem("AufgabenForm", JSON.stringify(v
 <template>
   <h1>Erstelle eine Aufgabe </h1>
   <form v-on:submit.prevent="" @submit="btnSaveAufgabe()">
+
     <input
         v-model="ref1.name"
         placeholder="Name"
