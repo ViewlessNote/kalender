@@ -24,7 +24,7 @@ const ref1 = ref({
   DeadLine: StandartEndTime(),
   TimeItTakes: "01:00",
   Details: "",
-  Aufgaben: true
+  aufgabe: true
 })
 
 function btnSaveAufgabe() {

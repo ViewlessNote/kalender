@@ -1,75 +1,7 @@
-<template>
-  <div class="calendar">
-    <div class="timeline">
-      <div class="spacer"></div>
-      <div class="time-marker">8:00 </div>
-      <div class="time-marker">9:00 </div>
-      <div class="time-marker">10:00 </div>
-      <div class="time-marker">11:00 </div>
-      <div class="time-marker">12:00 </div>
-      <div class="time-marker">13:00 </div>
-      <div class="time-marker">14:00 </div>
-      <div class="time-marker">15:00 </div>
-      <div class="time-marker">16:00 </div>
-      <div class="time-marker">17:00 </div>
-    </div>
-    <div class="days">
-      <div class="day mon">
-        <div class="date">
-          <p class="date-num">11</p>
-          <p class="date-day">Mon</p>
-        </div>
-        <div class="events">
-          <div class="event start-0 end-120 securities">
-            <p class="title">Securities Regulation</p>
-            <p class="time">8 - 11</p>
-          </div>
-        </div>
-      </div>
-      <div class="day tues">
-        <div class="date">
-          <p class="date-num">12</p>
-          <p class="date-day">Tues</p>
-        </div>
-        <div class="events">
-          //Events
-        </div>
-      </div>
-      <div class="day wed">
-        <div class="date">
-          <p class="date-num">13</p>
-          <p class="date-day">Wed</p>
-        </div>
-        <div class="events">
-          //Events
-        </div>
-      </div>
-      <div class="day thurs">
-        <div class="date">
-          <p class="date-num">14</p>
-          <p class="date-day">Thurs</p>
-        </div>
-        <div class="events">
-          Abruf()
-        </div>
-      </div>
-      <div class="day fri">
-        <div class="date">
-          <p class="date-num">15</p>
-          <p class="date-day">Fri</p>
-        </div>
-        <div class="events">
-          //Events
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
-
-<script>
+<script setup>
 import {ref} from "vue";
 
+const dayNames = ["Mon", "Tues", "Wed", "Thurs", "Fri"];
 let today = new Date();
 let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
@@ -111,15 +43,44 @@ function fetchDay(){
       })
 }
 
-let div = document.createElement('div');
-div.className = 'event start-120 end-360 securities';
 
 </script>
+<template>
+  <div class="calendar">
+    <div class="timeline">
+      <div class="spacer"></div>
+      <div class="time-marker">8:00 </div>
+      <div class="time-marker">9:00 </div>
+      <div class="time-marker">10:00 </div>
+      <div class="time-marker">11:00 </div>
+      <div class="time-marker">12:00 </div>
+      <div class="time-marker">13:00 </div>
+      <div class="time-marker">14:00 </div>
+      <div class="time-marker">15:00 </div>
+      <div class="time-marker">16:00 </div>
+      <div class="time-marker">17:00 </div>
+    </div>
+    <div class="days">
+      <div v-for="(day, index) in 5" :key="index" :class="['day', dayNames[index]]">
+        <div class="date">
+          <p class="date-num"></p>
+          <p class="date-day">{{dayNames[index]}}</p>
+        </div>
+        <div class="events">
+          <div class="event start-120 end-300 securities">
+            <p class="Beispiel Event">Stan-ley</p>
+            <p class="time">9:40 - 12:50</p>
+          </div>
+        </div>
+  </div>
+    </div>
+  </div>
+</template>
 
 
 <style>
 :root {
-  --color-text: #171616;
+  --color-text: #fffcfc;
   --numDays: 5;
   --numHours: 600;
   --numMinuts: 60;
@@ -164,11 +125,11 @@ div.className = 'event start-120 end-360 securities';
 
 /*Event ´Timings*/
 
-.start-0 {
-  grid-row-start: 1;
+.start-120 {
+  grid-row-start: 120;
 }
-.end-120 {
-  grid-row-end: 120;
+.end-300 {
+  grid-row-end: 300;
 }
 
 // Event
