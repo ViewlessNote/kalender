@@ -9,10 +9,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\SerializerInterface;
 
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Origin: http://localhost:5173');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS, DELETE, PUT');
-header('Access-Control-Allow-Headers: X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding, X-Auth-Token, content-type');
 // src/Controller/ControllerClass.php
 
 class ControllerClass extends AbstractController
@@ -59,12 +55,14 @@ class ControllerClass extends AbstractController
         $newTermin = $this->serializer->deserialize($request->getContent(), Termin::class, 'json');
 
         $this->terminService->updateTermin($id,$newTermin);
+        return new JsonResponse($newTermin);
     }
     //DELETE
     #[Route('/Termin/{id}', methods: ['DELETE'])]
     public function delTermin(int $id):JsonResponse
     {
         $this->terminService->deleteTermin($id);
+        return new JsonResponse("Termin deleted successfully");
     }
 
 }

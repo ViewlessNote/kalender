@@ -50,7 +50,7 @@ setInterval(()=> {
 }, 1000*10);
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
-
+fetchall();
 function fetchall(){
   arr.value = [];
   let Termine
@@ -72,12 +72,10 @@ function fetchall(){
           item2.Start = NStart.toISOString().slice(0, 16);
           item2.Ende = NEnde.toISOString().slice(0, 16);
           Termine[i] = JSON.stringify(item2)
-          console.log(Termine[i])
           arr.value.push(Termine[i])
         }
         return Termine;
       })
-
 }
 function sortEvents() {
   if (arr.value.length<1) {return}
@@ -86,6 +84,7 @@ function sortEvents() {
     if (item.Ende < compareDate) {
      if (item.Aufgabe === true ){
       if (item.Start < compareDate){
+        deleteFromDB(item.id)
         arr.value.splice(i, 1);
         if(FindPlaceInKalender(JSON.stringify(item))){
           console.log("DateFound")
@@ -102,7 +101,8 @@ function WriteToArray(newArrayItem){
   console.log("WriteToArray")
   JSON.parse(newArrayItem).id = arr.value.length;
   JSON.stringify(newArrayItem);
-  console.log(newArrayItem);
+  arr.value.push(newArrayItem)
+  console.log("Writing " + newArrayItem);
   fetch('http://127.0.0.1:8000/setTermin', {
     method: 'POST',
     body: newArrayItem
@@ -115,7 +115,6 @@ function WriteToArray(newArrayItem){
   ref1.value.Aufgabe = false;
   ref1.value.aktiv=false;
   ref1.value.Details= "";
-  fetchall();
 }
 
 
@@ -141,6 +140,7 @@ function FormatDay(){
 addEventListener("submit", UpdateData)
 function UpdateData(){
   let Data= window.localStorage.getItem("AufgabenForm");
+  console.log(Data);
   if (JSON.parse(Data).name === ""){
     return
   }
@@ -172,13 +172,12 @@ function parseAufgabenIntoEventFormat(item){
     newEintrag.value.Aufgabe = true;
     newEintrag.value.Details = val.Details;
     newEintrag.value.aktiv = true;
-    console.log(newEintrag.value)
     FindPlaceInKalender(JSON.stringify(newEintrag.value));
 
   }
 
 function deleteFromDB(id){
-  fetch('http://127.0.0.1:8000/Termin'+id, {
+  fetch('http://127.0.0.1:8000/Termin/'+id, {
     method: 'DELETE',
   })
       .then(function(response) {
@@ -188,13 +187,21 @@ function deleteFromDB(id){
 
 
 function FindPlaceInKalender(item){
-  console.log(item)
+
   while(!validateDate(item)){
     let item2 = JSON.parse(item)
     let NStart = new Date(item2.Start+"Z");
     let NEnde = new Date(item2.Ende+"Z");
     NStart.setMinutes(NStart.getMinutes() +1 );
     NEnde.setMinutes(NEnde.getMinutes()+1);
+    if (NStart.getMinutes() > 59){
+      NStart.setMinutes(0)
+      NStart.setHours(NStart.getHours() +1)
+      if (NStart.getHours() > 24){
+        NStart.setHours(0)
+        NStart.setDate(NStart.getDate()+1)
+      }
+    }
     item2.Start = NStart.toISOString().slice(0, 16);
     item2.Ende = NEnde.toISOString().slice(0, 16);
     item = JSON.stringify(item2)
@@ -209,7 +216,7 @@ watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(va
 
 
 function validateDate(itemForm) {
-  console.log(itemForm);
+
   const Start = JSON.parse(itemForm).Start;
   const Ende = JSON.parse(itemForm).Ende;
   Start.slice(0,16);
@@ -237,8 +244,6 @@ function validateDate(itemForm) {
       for (let item of arr.value){
         let OStart =JSON.parse(item).Start;
         let OEnde =JSON.parse(item).Ende;
-        OStart.toISOString().slice(0,16);
-        OEnde.toISOString().slice(0,16);
         if (Start > OStart){
           console.log("Start ist Gröser als O Start")
         }
@@ -277,10 +282,6 @@ function CheckAufAufgabe(){
   for(let x of arr.value){
     document.getElementById(JSON.parse(x).id).checked = true;
   }
-}
-
-function EraseOneTerminOrevent(){
-
 }
 
 Date.prototype.getWeek = function() {
@@ -327,7 +328,7 @@ var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'
       required
   />
     <button type="submit" >Save</button>
-    <button @click="fetchall()" >Reload</button>
+    <button type="reset" @click="fetchall()" >Reload</button>
   </form>
 
 
