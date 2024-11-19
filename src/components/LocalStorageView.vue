@@ -64,13 +64,16 @@ function fetchall(){
          Termine = JSON.parse(data)
         console.log(Termine.length)
         for (let i = 0; i < Termine.length; i++){
-          let S = new Date(Termine[i].Start)
-          let E = new Date(Termine[i].Ende)
-          E.toISOString().slice(0,16)
-          S.toISOString().slice(0,16)
-          Termine[i].Start = S
-         Termine[i].Ende = E
-          arr.value.push(JSON.stringify(Termine[i]))
+          let item2 = Termine[i]
+          let NStart = new Date(item2.Start);
+          let NEnde = new Date(item2.Ende);
+          NStart.setMinutes(NStart.getMinutes() +1 );
+          NEnde.setMinutes(NEnde.getMinutes()+1);
+          item2.Start = NStart.toISOString().slice(0, 16);
+          item2.Ende = NEnde.toISOString().slice(0, 16);
+          Termine[i] = JSON.stringify(item2)
+          console.log(Termine[i])
+          arr.value.push(Termine[i])
         }
         return Termine;
       })
@@ -112,6 +115,7 @@ function WriteToArray(newArrayItem){
   ref1.value.Aufgabe = false;
   ref1.value.aktiv=false;
   ref1.value.Details= "";
+  fetchall();
 }
 
 
@@ -174,8 +178,8 @@ function parseAufgabenIntoEventFormat(item){
   }
 
 function deleteFromDB(id){
-  fetch('http://127.0.0.1:8000/Termine'+id, {
-    method: 'GET',
+  fetch('http://127.0.0.1:8000/Termin'+id, {
+    method: 'DELETE',
   })
       .then(function(response) {
         return response.json();
