@@ -32,7 +32,7 @@ function ParseEventsIntoWeek(){
 function ConvertTimeToMinuts(s){
   s = s.slice(11,16);
     const [hours, minutes] = s.split(':').map(Number);
-    let time = ((hours * 60) + minutes) - 480;
+    let time = ((hours * 60) + minutes) - 479;
   if (time < 0){
     time = 0;
   }
@@ -118,7 +118,7 @@ document.addEventListener("DOMContentLoaded", function(){
   --numHours: 600;
   --numMinuts: 60;
   --timeHeight: 1px;
-  --timeLine:58.8px;
+  --timeLine:58px;
   --calBgColor: #dcdcdc;
   --eventBorderColor: #eadcde;
   --eventColor1: #aaa2a2;

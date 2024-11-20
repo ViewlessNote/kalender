@@ -226,36 +226,66 @@ watch(arr, val => {
 
 
 function validateDate(itemForm) {
-
+  console.log(itemForm);
   const Start = JSON.parse(itemForm).Start;
   const Ende = JSON.parse(itemForm).Ende;
-  Start.slice(0,16);
-  Ende.slice(0,16);
 
-      if (Start > Ende){
-        return false;
-      }
+  if(Ende < Start){
+    alert("Das Ende des Termins Liegt vor seinem Startpunkt")
+    console.log("Alert")
+    return false;
+  }
 
-      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00" ||  JSON.parse(itemForm).Ende.slice(11,16) < "8:00"){
-        return false;
-      }
-      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00" || JSON.parse(itemForm).Start.slice(11,16) > "18:00"){
-       return false;
-      }
+  if (Start < compareDate){
+    //Wenn eine aufgabe noch nicht abgehackt wurde
+    console.log("Aufgabe nicht erledigt, sie wurde weiter geschoben")
+    return false;
+  }
 
-      for (let item of arr.value) {
-        let OStart = JSON.parse(item).Start;
-        let OEnde = JSON.parse(item).Ende;
-        console.log("Testing:::")
-        if (Start > OStart && Start < Ende){
-          return false;
-        }
-        if (Ende > OEnde && Ende < OEnde){
-          return false;
-        }
-      }
-      return true;
+  if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00"){
+    return false;
+  }
+  if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00"){
+    return false;
+  }
+
+  for (let item of arr.value){
+    let OStart =JSON.parse(item).Start;
+    let OEnde =JSON.parse(item).Ende;
+    if (Start > OStart){
+      console.log("Start ist Gröser als O Start")
     }
+    if(Start === OStart || Ende === OEnde){
+      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
+        deleteFromDB(JSON.parse(item).id)
+        arr.value.splice(JSON.parse(item).id-1, 1);
+        setTimeout(() =>{
+          FindPlaceInKalender(item);
+        },1)
+      }else{return false;}
+
+    }
+    if (Ende > OStart && Ende < OEnde){
+      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
+        deleteFromDB(JSON.parse(item).id)
+        arr.value.splice(JSON.parse(item).id-1, 1);
+        setTimeout(() =>{
+          FindPlaceInKalender(item);
+        },1)
+      }else{return false;}
+    }
+    if (Start > OStart && Start < OEnde){
+      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
+        deleteFromDB(JSON.parse(item).id)
+        arr.value.splice(JSON.parse(item).id-1, 1);
+        setTimeout(() =>{
+          FindPlaceInKalender(item);
+        },1)
+      }else{return false;}
+    }
+  }
+  return true;
+}
 function CheckAufAufgabe(){
   for(let x of arr.value){
     document.getElementById(JSON.parse(x).id).checked = true;
