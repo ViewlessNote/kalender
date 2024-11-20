@@ -10,7 +10,6 @@ function CompareDateUpdate(){
   let newDay = new Date()
   newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset());
   compareDate = newDay.toISOString().slice(0, 16);
-  compareDate = compareDate +".000Z"
 }
 
 function StandartEndTime(){
@@ -47,10 +46,10 @@ const Aufgabenref = ref({
 setInterval(()=> {
   CompareDateUpdate()
  sortEvents();
-}, 1000*10);
+}, 1000);
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
-fetchall();
+
 function fetchall(){
   arr.value = [];
   let Termine
@@ -69,6 +68,8 @@ function fetchall(){
           let NEnde = new Date(item2.Ende);
           NStart.setMinutes(NStart.getMinutes() +1 );
           NEnde.setMinutes(NEnde.getMinutes()+1);
+          NStart.setHours(NStart.getHours() +1);
+          NEnde.setHours(NEnde.getHours() +1);
           item2.Start = NStart.toISOString().slice(0, 16);
           item2.Ende = NEnde.toISOString().slice(0, 16);
           Termine[i] = JSON.stringify(item2)
@@ -93,8 +94,6 @@ function sortEvents() {
     }
   }
   }
-  arr.value.sort((x, y) => {
-    return new Date(x.Start) > new Date(y.Start) ? 1 : -1})
 }
 
 function WriteToArray(newArrayItem){
@@ -115,6 +114,7 @@ function WriteToArray(newArrayItem){
   ref1.value.Aufgabe = false;
   ref1.value.aktiv=false;
   ref1.value.Details= "";
+  window.localStorage.setItem("ArrLocalStorage", arr.value);
 }
 
 
@@ -125,7 +125,6 @@ function btnSave() {
        return ;
      }
   WriteToArray(window.localStorage.getItem("StorageForm"));
-  window.localStorage.setItem("ArrLocalStorage", JSON.stringify(arr.value));
   CheckAufAufgabe();
 }
 
@@ -190,8 +189,8 @@ function FindPlaceInKalender(item){
 
   while(!validateDate(item)){
     let item2 = JSON.parse(item)
-    let NStart = new Date(item2.Start+"Z");
-    let NEnde = new Date(item2.Ende+"Z");
+    let NStart = new Date(item2.Start.slice(0, 16));
+    let NEnde = new Date(item2.Ende.slice(0, 16));
     NStart.setMinutes(NStart.getMinutes() +1 );
     NEnde.setMinutes(NEnde.getMinutes()+1);
     if (NStart.getMinutes() > 59){
@@ -202,6 +201,8 @@ function FindPlaceInKalender(item){
         NStart.setDate(NStart.getDate()+1)
       }
     }
+    NStart.setHours(NStart.getHours() +1);
+    NEnde.setHours(NEnde.getHours() +1);
     item2.Start = NStart.toISOString().slice(0, 16);
     item2.Ende = NEnde.toISOString().slice(0, 16);
     item = JSON.stringify(item2)
@@ -212,7 +213,9 @@ function FindPlaceInKalender(item){
 
 watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
 },{deep:true});
-
+watch(arr, val => {
+  window.localStorage.setItem("ArrLocalStorage", JSON.stringify(val))
+},{deep:true})
 
 
 function validateDate(itemForm) {
@@ -228,11 +231,6 @@ function validateDate(itemForm) {
         return false;
       }
 
-      if (Start < compareDate){
-        //Wenn eine aufgabe noch nicht abgehackt wurde
-        console.log("Aufgabe nicht erledigt, sie wurde weiter geschoben")
-        return false;
-      }
 
       if(JSON.parse(itemForm).Aufgaben === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00Z000"){
         return false;
@@ -292,7 +290,7 @@ Date.prototype.getWeek = function() {
 let weekNumber = (new Date()).getWeek();
 
 var dayNames = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-
+fetchall();
 </script>
 
 <template>
