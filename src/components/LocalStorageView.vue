@@ -186,32 +186,16 @@ function deleteFromDB(id){
 
 function FindPlaceInKalender(item){
 
+  console.log(item)
   while(!validateDate(item)){
     let item2 = JSON.parse(item)
-    let NStart = new Date(item2.Start.slice(0, 16));
-    let NEnde = new Date(item2.Ende.slice(0, 16));
-    NStart.setMinutes(NStart.getMinutes() +1 );
-    NEnde.setMinutes(NEnde.getMinutes()+1);
-    if (NStart.getMinutes() > 59){
-      NStart.setMinutes(0)
-      NStart.setHours(NStart.getHours() +1)
-      if (NStart.getHours() > 24){
-        NStart.setHours(0)
-        NStart.setDate(NStart.getDate()+1)
-      }
-    }
-    if (NEnde.getMinutes() > 59){
-      NEnde.setMinutes(0)
-      NEnde.setHours(NEnde.getHours() +1)
-      if (NEnde.getHours() > 24){
-        NEnde.setHours(0)
-        NEnde.setDate(NEnde.getDate()+1)
-      }
-    }
-    NStart.setHours(NStart.getHours() +1);
-    NEnde.setHours(NEnde.getHours() +1);
+    let NStart = new Date(item2.Start);
+    let NEnde = new Date(item2.Ende);
+    NStart.setMinutes(NStart.getMinutes() +1 - NStart.getTimezoneOffset() );
+    NEnde.setMinutes(NEnde.getMinutes()+1- NEnde.getTimezoneOffset());
     item2.Start = NStart.toISOString().slice(0, 16);
     item2.Ende = NEnde.toISOString().slice(0, 16);
+
     item = JSON.stringify(item2)
   }
   WriteToArray(item);
@@ -236,21 +220,23 @@ function validateDate(itemForm) {
         return false;
       }
 
-      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00" ||  JSON.parse(itemForm).Ende.slice(11,16) < "8:00"){
+      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00"){
         return false;
       }
-      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00" || JSON.parse(itemForm).Start.slice(11,16) > "18:00"){
+      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00"){
        return false;
       }
 
-      for (let item of arr.value) {
+      for (var i = 0; 0 < arr.value.length; i++) {
+        let item = arr.value[i];
         let OStart = JSON.parse(item).Start;
         let OEnde = JSON.parse(item).Ende;
         console.log("Testing:::")
-        if (Start > OStart && Start < Ende){
+        if (Start > OStart && Start < OEnde){
+
           return false;
         }
-        if (Ende > OEnde && Ende < OEnde){
+        if (OStart > OEnde && Ende < OEnde){
           return false;
         }
       }
