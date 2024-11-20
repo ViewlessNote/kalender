@@ -34,7 +34,7 @@ const ref1 = ref({
   Start: compareDate,
   Ende: StandartEndTime(),
   Aufgabe: false,
-  aktiv:false
+  Aktiv:false
 })
 const Aufgabenref = ref({
   name: "",
@@ -46,7 +46,7 @@ const Aufgabenref = ref({
 setInterval(()=> {
   CompareDateUpdate()
  sortEvents();
-}, 1000);
+}, 1000*10);
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
@@ -82,17 +82,16 @@ function sortEvents() {
   if (arr.value.length<1) {return}
   for (let i = 0; i <= arr.value.length-1; i++) {
     let item = JSON.parse(arr.value[i]);
-    if (item.Ende < compareDate) {
-     if (item.Aufgabe === true ){
-      if (item.Start < compareDate){
-        deleteFromDB(item.id)
-        arr.value.splice(i, 1);
-        if(FindPlaceInKalender(JSON.stringify(item))){
-          console.log("DateFound")
+    if (item.Aktiv === true ){
+      if (item.Ende > compareDate) {
+        if (item.Start < compareDate){
+          arr.value.splice(i, 1);
+          if(FindPlaceInKalender(JSON.stringify(item))){
+            console.log("DateFound")
+          }
         }
       }
     }
-  }
   }
 }
 
@@ -112,7 +111,7 @@ function WriteToArray(newArrayItem){
   ref1.value.Start= compareDate;
   ref1.value.Ende= StandartEndTime();
   ref1.value.Aufgabe = false;
-  ref1.value.aktiv=false;
+  ref1.value.Aktiv=false;
   ref1.value.Details= "";
   window.localStorage.setItem("ArrLocalStorage", arr.value);
 }
@@ -122,10 +121,10 @@ function btnSave() {
   console.log(compareDate);
      if(!validateDate(window.localStorage.getItem("StorageForm"))){
       alert("Wrong Input or date is occupied")
-       return ;
+     }else{
+       WriteToArray(window.localStorage.getItem("StorageForm"));
+       CheckAufAufgabe();
      }
-  WriteToArray(window.localStorage.getItem("StorageForm"));
-  CheckAufAufgabe();
 }
 
 function FormatDay(){
@@ -170,7 +169,7 @@ function parseAufgabenIntoEventFormat(item){
     newEintrag.value.Ende =  Ende;
     newEintrag.value.Aufgabe = true;
     newEintrag.value.Details = val.Details;
-    newEintrag.value.aktiv = true;
+    newEintrag.value.Aktiv = true;
     FindPlaceInKalender(JSON.stringify(newEintrag.value));
 
   }
@@ -201,6 +200,14 @@ function FindPlaceInKalender(item){
         NStart.setDate(NStart.getDate()+1)
       }
     }
+    if (NEnde.getMinutes() > 59){
+      NEnde.setMinutes(0)
+      NEnde.setHours(NEnde.getHours() +1)
+      if (NEnde.getHours() > 24){
+        NEnde.setHours(0)
+        NEnde.setDate(NEnde.getDate()+1)
+      }
+    }
     NStart.setHours(NStart.getHours() +1);
     NEnde.setHours(NEnde.getHours() +1);
     item2.Start = NStart.toISOString().slice(0, 16);
@@ -225,53 +232,26 @@ function validateDate(itemForm) {
   Start.slice(0,16);
   Ende.slice(0,16);
 
-      if(Ende < Start){
-        alert("Das Ende des Termins Liegt vor seinem Startpunkt")
-        console.log("Alert")
+      if (Start > Ende){
         return false;
       }
 
-
-      if(JSON.parse(itemForm).Aufgaben === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00Z000"){
+      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00" ||  JSON.parse(itemForm).Ende.slice(11,16) < "8:00"){
         return false;
       }
-      if(JSON.parse(itemForm).Aufgaben === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00Z000"){
+      if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00" || JSON.parse(itemForm).Start.slice(11,16) > "18:00"){
        return false;
       }
 
-      for (let item of arr.value){
-        let OStart =JSON.parse(item).Start;
-        let OEnde =JSON.parse(item).Ende;
-        if (Start > OStart){
-          console.log("Start ist Gröser als O Start")
+      for (let item of arr.value) {
+        let OStart = JSON.parse(item).Start;
+        let OEnde = JSON.parse(item).Ende;
+        console.log("Testing:::")
+        if (Start > OStart && Start < Ende){
+          return false;
         }
-        if(Start === OStart || Ende === OEnde){
-          if (JSON.parse(item).Aufgaben === true && JSON.parse(itemForm).Aufgaben === false){
-            arr.value.splice(JSON.parse(item).id-1, 1);
-            deleteFromDB(JSON.parse(item).id);
-            setTimeout(() =>{
-              FindPlaceInKalender(item);
-            },1)
-          }else{return false;}
-        }
-
-        if (Ende > OStart && Ende < OEnde){
-          if (JSON.parse(item).Aufgaben === true && JSON.parse(itemForm).Aufgaben === false){
-            arr.value.splice(JSON.parse(item).id-1, 1);
-            deleteFromDB(JSON.parse(item).id);
-            setTimeout(() =>{
-              FindPlaceInKalender(item);
-            },1)
-          }else{return false;}
-        }
-        if (Start > OStart && Start < OEnde){
-          if (JSON.parse(item).Aufgaben === true && JSON.parse(itemForm).Aufgaben === false){
-            arr.value.splice(JSON.parse(item).id-1, 1);
-            deleteFromDB(JSON.parse(item).id);
-            setTimeout(() =>{
-              FindPlaceInKalender(item);
-            },1)
-          }else{return false;}
+        if (Ende > OEnde && Ende < OEnde){
+          return false;
         }
       }
       return true;

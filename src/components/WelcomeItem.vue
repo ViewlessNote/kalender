@@ -98,8 +98,10 @@ document.addEventListener("DOMContentLoaded", function(){
         </div>
         <div :class="['events', dayNames[index]]" >
           <div v-for="event in arrT[index]" :class= "['event']" :style="{'grid-row-start': ConvertTimeToMinuts(JSON.parse(event).Start), 'grid-row-end':ConvertTimeToMinuts(JSON.parse(event).Ende)}">
-            <div>{{JSON.parse(event).name}}</div>
-            <div>{{JSON.parse(event).Start.slice(11,16)}} - {{JSON.parse(event).Ende.slice(11,16)}}</div>
+           <div class="wraper">
+             <div>{{JSON.parse(event).name}}</div><button>X</button>
+             <div>{{JSON.parse(event).Start.slice(11,16)}} - {{JSON.parse(event).Ende.slice(11,16)}}</div>
+           </div>
           </div>
         </div>
         </div>
@@ -125,6 +127,7 @@ document.addEventListener("DOMContentLoaded", function(){
   --eventColor4: #d1ffe6;
   --timline1: 11;
 }
+
 
 .calendar {
   display: grid;
