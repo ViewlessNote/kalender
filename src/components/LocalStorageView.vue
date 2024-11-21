@@ -18,11 +18,6 @@ function StandartEndTime(){
   return newDay.toISOString().slice(0, 16);
 }
 
-const DayStart = "8:00"
-const DayEnd = "18:00"
-const MaxAufgabenPerDay = 3;
-let AufgabenToday = 0;
-
 const StorageForm = window.localStorage.getItem("StorageForm");
 const ArrLocalStorage = window.localStorage.getItem("arr");
 const arrAufgaben = ref([]);
@@ -50,10 +45,10 @@ setInterval(()=> {
 
 const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
 
-function fetchall(){
+async function fetchall(){
   arr.value = [];
   let Termine
-  fetch('http://127.0.0.1:8000/Termine', {
+  fetch('/Termine', {
     method: 'GET',
   })
       .then(function(response) {
@@ -97,7 +92,7 @@ function sortEvents() {
 
 function WriteToArray(newArrayItem){
   console.log("WriteToArray")
-  JSON.parse(newArrayItem).id = arr.value.length;
+  JSON.parse(newArrayItem).id = JSON.parse(arr.value[arr.value.length-1]).id+1;
   JSON.stringify(newArrayItem);
   arr.value.push(newArrayItem)
   console.log("Writing " + newArrayItem);
@@ -115,6 +110,8 @@ function WriteToArray(newArrayItem){
   ref1.value.Details= "";
   window.localStorage.setItem("ArrLocalStorage", arr.value);
 }
+
+
 
 
 function btnSave() {
@@ -175,10 +172,11 @@ function parseAufgabenIntoEventFormat(item){
   }
 
 function deleteFromDB(id){
-  fetch('http://127.0.0.1:8000/Termin/'+id, {
+  fetch('/Termin/'+id, {
     method: 'DELETE',
   })
       .then(function(response) {
+        console.log("Deleted. "+ id)
         return response.json();
       })
 }
@@ -238,23 +236,18 @@ function validateDate(itemForm) {
 
   if (Start < compareDate){
     //Wenn eine aufgabe noch nicht abgehackt wurde
-    console.log("Aufgabe nicht erledigt, sie wurde weiter geschoben")
-    return false;
-  }
-
-  if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00"){
     return false;
   }
   if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00"){
+    return false;
+  }
+  if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Ende.slice(11,16) > "18:00"){
     return false;
   }
 
   for (let item of arr.value){
     let OStart =JSON.parse(item).Start;
     let OEnde =JSON.parse(item).Ende;
-    if (Start > OStart){
-      console.log("Start ist Gröser als O Start")
-    }
     if(Start === OStart || Ende === OEnde){
       if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
         deleteFromDB(JSON.parse(item).id)

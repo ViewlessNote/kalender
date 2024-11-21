@@ -2,6 +2,9 @@
 
 import {ref} from "vue";
 
+
+
+
 const dayNames = ["Mon", "Tues", "Wed", "Thurs", "Fri"];
 let today = new Date();
 let deadline = new Date();
@@ -48,6 +51,20 @@ function updateArr(){
 }
 
 addEventListener("mousedown", ParseEventsIntoWeek)
+function deletEvent(id){
+  for (let i = 0; i < arr.value.length; i++){
+    if (JSON.parse(arr.value[i]).id === id){
+      arr.value.splice(id-1, 1)
+    }
+  }
+  fetch('/Termin/'+id, {
+    method: 'DELETE',
+  })
+      .then(function(response) {
+        console.log("Deleted. "+ id)
+        return response.json();
+      })
+}
 
 </script>
 
@@ -97,9 +114,9 @@ document.addEventListener("DOMContentLoaded", function(){
           <p class="date-day">{{dayNames[index]}} </p>
         </div>
         <div :class="['events', dayNames[index]]" >
-          <div v-for="event in arrT[index]" :class= "['event']" :style="{'grid-row-start': ConvertTimeToMinuts(JSON.parse(event).Start), 'grid-row-end':ConvertTimeToMinuts(JSON.parse(event).Ende)}">
+          <div v-for="(event, i) in arrT[index]" :class= "['event']" :style="{'grid-row-start': ConvertTimeToMinuts(JSON.parse(event).Start), 'grid-row-end':ConvertTimeToMinuts(JSON.parse(event).Ende)}">
            <div class="wraper">
-             <div>{{JSON.parse(event).name}}</div><button>X</button>
+             <div>{{JSON.parse(event).name}}</div><button @click="deletEvent(JSON.parse(arrT[index][i]).id)">X</button>
              <div>{{JSON.parse(event).Start.slice(11,16)}} - {{JSON.parse(event).Ende.slice(11,16)}}</div>
            </div>
           </div>
