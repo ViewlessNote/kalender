@@ -1,28 +1,14 @@
 <script setup>
 
 import {ref} from "vue";
-
-
-
+import {arr, ref1} from "./values"
 
 const dayNames = ["Mon", "Tues", "Wed", "Thurs", "Fri"];
 let today = new Date();
 let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
-let compareDate = deadline.toISOString().slice(0, 16);
-
-let day;
 let arrT = ref([[]]);
-const arr = ref([]);
-const ref1 = ref({
-  id: 0,
-  name: "",
-  Details: "",
-  Start: compareDate,
-  Ende: compareDate,
-  Aufgabe: false,
-  aktiv:false
-})
+
 
 function ParseEventsIntoWeek(){
   updateArr();
@@ -46,15 +32,14 @@ function GetDayOfWeek(date){
   return d.getDay();
 }
 function updateArr(){
-  arr.value = JSON.parse(window.localStorage.getItem("ArrLocalStorage"));
   console.log("UpdateArr: "+arr.value)
 }
 
 addEventListener("mousedown", ParseEventsIntoWeek)
-function deletEvent(id){
+async function deletEvent(id){
   for (let i = 0; i < arr.value.length; i++){
     if (JSON.parse(arr.value[i]).id === id){
-      arr.value.splice(id-1, 1)
+      arr.value.splice(i, 1)
     }
   }
   fetch('/Termin/'+id, {
@@ -62,9 +47,13 @@ function deletEvent(id){
   })
       .then(function(response) {
         console.log("Deleted. "+ id)
-        return response.json();
       })
+
+  ParseEventsIntoWeek();
 }
+setInterval(()=> {
+  ParseEventsIntoWeek();
+}, 1000);
 
 </script>
 
@@ -183,7 +172,6 @@ document.addEventListener("DOMContentLoaded", function(){
   grid-row-end: 300;
 }
 
-// Event
 
 .title {
   font-weight: 600;
@@ -203,7 +191,6 @@ document.addEventListener("DOMContentLoaded", function(){
   height: 60px
 }
 
-// Global / Etc
 
 body {
   font-family: system-ui, sans-serif;

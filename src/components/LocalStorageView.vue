@@ -1,11 +1,12 @@
 <script setup>
 import {ref, watch} from "vue";
+import {arr, ref1} from "./values"
+
 
 let today = new Date();
 let deadline = new Date();
 deadline.setMinutes(deadline.getMinutes() - deadline.getTimezoneOffset());
 let compareDate = deadline.toISOString().slice(0, 16);
-
 function CompareDateUpdate(){
   let newDay = new Date()
   newDay.setMinutes(newDay.getMinutes() - newDay.getTimezoneOffset());
@@ -21,16 +22,7 @@ function StandartEndTime(){
 const StorageForm = window.localStorage.getItem("StorageForm");
 const ArrLocalStorage = window.localStorage.getItem("arr");
 const arrAufgaben = ref([]);
-const arr = ref([]);
-const ref1 = ref({
-  id: 0,
-  name: "",
-  Details: "",
-  Start: compareDate,
-  Ende: StandartEndTime(),
-  Aufgabe: false,
-  Aktiv:false
-})
+
 const Aufgabenref = ref({
   name: "",
   DeadLine: compareDate,
@@ -41,9 +33,7 @@ const Aufgabenref = ref({
 setInterval(()=> {
   CompareDateUpdate()
  sortEvents();
-}, 1000*10);
-
-const now_date = (today.getFullYear() + '-' + (today.getMonth()+1) + '-' + FormatDay());
+}, 1000*30);
 
 async function fetchall(){
   arr.value = [];
@@ -92,7 +82,11 @@ function sortEvents() {
 
 function WriteToArray(newArrayItem){
   console.log("WriteToArray")
-  JSON.parse(newArrayItem).id = JSON.parse(arr.value[arr.value.length-1]).id+1;
+  if (arr.value.length > 0){
+    JSON.parse(newArrayItem).id = JSON.parse(arr.value[arr.value.length-1]).id+1;
+  }else {
+    JSON.parse(newArrayItem).id = 0;
+  }
   JSON.stringify(newArrayItem);
   arr.value.push(newArrayItem)
   console.log("Writing " + newArrayItem);
@@ -108,7 +102,7 @@ function WriteToArray(newArrayItem){
   ref1.value.Aufgabe = false;
   ref1.value.Aktiv=false;
   ref1.value.Details= "";
-  window.localStorage.setItem("ArrLocalStorage", arr.value);
+  fetchall();
 }
 
 
@@ -171,14 +165,19 @@ function parseAufgabenIntoEventFormat(item){
 
   }
 
-function deleteFromDB(id){
+async function deleteFromDB(id){
+  for (let i = 0; i < arr.value.length; i++){
+    if (JSON.parse(arr.value[i]).id === id){
+      arr.value.splice(i, 1)
+    }
+  }
   fetch('/Termin/'+id, {
     method: 'DELETE',
   })
       .then(function(response) {
         console.log("Deleted. "+ id)
-        return response.json();
       })
+
 }
 
 
@@ -218,9 +217,7 @@ function FindPlaceInKalender(item){
 
 watch(ref1, val => {window.localStorage.setItem("StorageForm", JSON.stringify(val));
 },{deep:true});
-watch(arr, val => {
-  window.localStorage.setItem("ArrLocalStorage", JSON.stringify(val))
-},{deep:true})
+
 
 
 function validateDate(itemForm) {
@@ -235,8 +232,11 @@ function validateDate(itemForm) {
   }
 
   if (Start < compareDate){
-    //Wenn eine aufgabe noch nicht abgehackt wurde
-    return false;
+    deleteFromDB(JSON.parse(itemForm).id)
+    arr.value.splice(JSON.parse(itemForm).id-1, 1);
+    setTimeout(() =>{
+      FindPlaceInKalender(itemForm);
+    },1)
   }
   if(JSON.parse(itemForm).Aufgabe === true && JSON.parse(itemForm).Start.slice(11,16) < "08:00"){
     return false;
@@ -249,7 +249,7 @@ function validateDate(itemForm) {
     let OStart =JSON.parse(item).Start;
     let OEnde =JSON.parse(item).Ende;
     if(Start === OStart || Ende === OEnde){
-      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
+      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aktiv === true){
         deleteFromDB(JSON.parse(item).id)
         arr.value.splice(JSON.parse(item).id-1, 1);
         setTimeout(() =>{
@@ -259,7 +259,7 @@ function validateDate(itemForm) {
 
     }
     if (Ende > OStart && Ende < OEnde){
-      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
+      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aktiv === true){
         deleteFromDB(JSON.parse(item).id)
         arr.value.splice(JSON.parse(item).id-1, 1);
         setTimeout(() =>{
@@ -268,7 +268,7 @@ function validateDate(itemForm) {
       }else{return false;}
     }
     if (Start > OStart && Start < OEnde){
-      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aufgabe === false){
+      if (JSON.parse(item).Aufgabe === true && JSON.parse(itemForm).Aktiv === true){
         deleteFromDB(JSON.parse(item).id)
         arr.value.splice(JSON.parse(item).id-1, 1);
         setTimeout(() =>{
@@ -297,7 +297,7 @@ fetchall();
 </script>
 
 <template>
-  <h1>Erstelle einen Kalender Eintrage {{now_date}}</h1>
+  <h1>Erstelle einen Kalender Eintrage Week:{{weekNumber}}</h1>
   <form v-on:submit.prevent="" @submit="btnSave">
   <input
 
@@ -334,7 +334,7 @@ fetchall();
 
 
   <ul  v-for="x in arr" key="{{x}}">
-    <li>{{JSON.parse(x).name}}</li>
+    <li>{{JSON.parse(x).id}} : {{JSON.parse(x).name}}</li>
     <li>Start:{{JSON.parse(x).Start}}</li>
     <li>Ende:{{JSON.parse(x).Ende}}</li>
     <li> Aufgabe: <input id={{JSON.parse(x).id}} type="checkbox" ></li>
